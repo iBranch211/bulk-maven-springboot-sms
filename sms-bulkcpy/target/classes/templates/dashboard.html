@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Bulk SMS</title>
+</head>
+
+<body>
+
+<div class="container">
+
+    <section class="jumbotron">
+        <h1>SMS HOME</h1>
+        Sending from <span th:text="${phoneNumber}">XXXXX</span>
+    </section>
+
+    <div class="row">
+
+        <div class="col">
+            <section class="card">
+                <h2 class="card-header">Add Phone number</h2>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="new-name">Contact name:</label>
+                        <input type="tel" id="new-name" class="form-control"/>
+                        <label for="new-phone-number">Phone number:</label>
+                        <input type="tel" id="new-phone-number" class="form-control"/>
+                    </div>
+                    <button id="add-new-phone-number" class="btn btn-primary">Add Number</button>
+                </div>
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="gender" id="all" autocomplete="off" value="ALL" checked>All
+                    </label>
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="gender" id="Male" autocomplete="off" value="Male" >Male
+                    </label>
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="gender" id="Female" autocomplete="off" value="Female">Female
+                    </label>
+                </div>
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="stream" id="all2" autocomplete="off" value="ALL" checked>All
+                    </label>
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="stream" id="tech" autocomplete="off" value="tech">BTech
+                    </label>
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="stream" id="mca" autocomplete="off" value="MCA">MCA
+                    </label>
+                </div>
+            </section>
+        </div>
+
+        <div class="col">
+            <section class="card">
+                <h2 class="card-header">Send Messages</h2>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="available-numbers">Select Numbers:</label>
+                        <select multiple id="available-numbers" class="form-control"></select>
+                        <label for="messageDetails">Enter your messageDetails:</label>
+                        <textarea id="messageDetails" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button id="send-messages" class="btn btn-primary">Send Message</button>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    window.addEventListener("DOMContentLoaded", e => {
+
+        const log = msg => {console.log(msg)}
+
+        log("Welcome to the SMS dashboard");
+
+        const newName = document.querySelector("#new-name");
+        const newPhoneNumber = document.querySelector("#new-phone-number");
+        const availableNumbers = document.querySelector("#available-numbers");
+        const messageContent = document.querySelector("#messageDetails");
+
+        document.querySelector("#add-new-phone-number").onclick = e => {
+            log("Adding number: " + newPhoneNumber.value);
+
+            const newOption = document.createElement("option");
+            newOption.text = `${newName.value} (${newPhoneNumber.value})`;
+            newOption.value = newPhoneNumber.value;
+
+            availableNumbers.add(newOption, null);
+
+            newName.value = "";
+            newPhoneNumber.value = "";
+        };
+
+
+        document.querySelector("#send-messages").onclick = e => {
+            log("Sending messageDetails: " + messageContent.value);
+
+            var selectedNumbers = [];
+            document.querySelectorAll("#available-numbers option:checked").forEach( o => selectedNumbers.push(o.value) );
+            var g=document.querySelector('input[name="gender"]:checked')
+        var gender1=g.value;
+        var s=document.querySelector('input[name="stream"]:checked')
+        var stream1=s.value;
+            const postBody = {
+                numbers: selectedNumbers,
+                message: messageContent.value,
+                gender: gender1,
+                stream: stream1
+            }
+
+            var req = new XMLHttpRequest();
+            req.addEventListener("load", e => {
+                if (e.target.status === 202) {
+                    log("Sent!");
+                    messageContent.value = "";
+                } else {
+                    console.error("Error sending messageDetails", e.target);
+                }
+            });
+            req.open("POST", "/send-messages", true);
+            req.setRequestHeader("Content-Type", "application/json");
+            req.send(JSON.stringify(postBody));
+        }
+    }, false);
+
+</script>
+
+</body>
+
+</html>

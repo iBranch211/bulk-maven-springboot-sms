@@ -1,0 +1,23 @@
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+spring:
+  datasource:
+    password: <your password>
+    url: jdbc:postgresql://localhost:5432/registration
+    username: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgresSQLDialect
+          format_sql: true
+
+        show-sql: true
+
+    properties:
+      hibernate:
+        schema_update:
+          unique_constraint_strategy=RECREATE_QUIETLY:
